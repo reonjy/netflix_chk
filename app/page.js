@@ -3,9 +3,9 @@
 import { useState, useRef, useCallback } from "react";
 import { autoDetectAndParse, splitCookieSets } from "./lib/cookieParser";
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════════════════
    SVG Icons (inline to avoid external deps)
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ═══════════════════════════════════════════════════════════════════════════ */
 const Icons = {
   cookie: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -73,11 +73,11 @@ const Icons = {
   ),
 };
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════════════════
    Main Page Component
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ═══════════════════════════════════════════════════════════════════════════ */
 export default function Home() {
-  // â€”â€”â€” State â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  // --- State --------------------------------------------------------
   const [cookieText, setCookieText] = useState("");
   const [format, setFormat] = useState("auto");
   const [isChecking, setIsChecking] = useState(false);
@@ -89,7 +89,7 @@ export default function Home() {
   const fileInputRef = useRef(null);
   const toastIdRef = useRef(0);
 
-  // â€”â€”â€” Toast Helper â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  // --- Toast Helper ------------------------------------------
   const showToast = useCallback((message, type = "info") => {
     const id = ++toastIdRef.current;
     setToasts((prev) => [...prev, { id, message, type }]);
@@ -98,7 +98,7 @@ export default function Home() {
     }, 4000);
   }, []);
 
-  // â€”â€”â€” File Upload Handler â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  // --- File Upload Handler ----------------------------------
   const handleFileUpload = useCallback(
     (file) => {
       if (!file) return;
@@ -113,7 +113,7 @@ export default function Home() {
     [showToast]
   );
 
-  // â€”â€”â€” Drag & Drop â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  // --- Drag & Drop ------------------------------------------
   const handleDrop = useCallback(
     (e) => {
       e.preventDefault();
@@ -124,7 +124,7 @@ export default function Home() {
     [handleFileUpload]
   );
 
-  // â€”â€”â€” Copy Cookies in Netscape Format â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  // --- Copy Cookies in Netscape Format ----------------------
   const copyNetscapeCookies = useCallback(
     (resultItem) => {
       const netscapeLines = resultItem.cookies
@@ -148,7 +148,7 @@ export default function Home() {
     [showToast]
   );
 
-  // â€”â€”â€” Check Cookies â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  // --- Check Cookies ------------------------------------------
   const handleCheck = useCallback(async () => {
     if (!cookieText.trim()) {
       showToast("Please paste or upload cookies first", "error");
@@ -199,9 +199,9 @@ export default function Home() {
           allResults.push({
             id: i + 1,
             status: data.status || "error",
-            plan: data.details?.plan || "â€”",
-            email: data.details?.email || "â€”",
-            country: data.details?.country || "â€”",
+            plan: data.details?.plan || "-",
+            email: data.details?.email || "-",
+            country: data.details?.country || "-",
             extraMembers: data.details?.extraMembers ?? null,
             error: data.error || null,
             cookies: parsedSets[i].cookies,
@@ -210,9 +210,9 @@ export default function Home() {
           allResults.push({
             id: i + 1,
             status: "error",
-            plan: "â€”",
-            email: "â€”",
-            country: "â€”",
+            plan: "-",
+            email: "-",
+            country: "-",
             extraMembers: null,
             error: err.message,
             cookies: parsedSets[i].cookies,
@@ -241,7 +241,7 @@ export default function Home() {
     }
   }, [cookieText, showToast]);
 
-  // â€”â€”â€” Export Working Cookies â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  // --- Export Working Cookies ----------------------------------
   const exportWorking = useCallback(() => {
     const working = results.filter((r) => r.status === "working");
     if (working.length === 0) {
@@ -269,14 +269,14 @@ export default function Home() {
     showToast(`Exported ${working.length} working cookie set(s)`, "success");
   }, [results, showToast]);
 
-  // â€”â€”â€” Clear All â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  // --- Clear All ------------------------------------------
   const clearAll = useCallback(() => {
     setCookieText("");
     setResults([]);
     setProgress({ current: 0, total: 0 });
   }, []);
 
-  // â€”â€”â€” Stats Calculation â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  // --- Stats Calculation ----------------------------------
   const stats = {
     total: results.length,
     working: results.filter((r) => r.status === "working").length,
@@ -284,13 +284,13 @@ export default function Home() {
     errors: results.filter((r) => r.status === "error").length,
   };
 
-  // â€”â€”â€” Sort results: working first, then expired, then errors â€”â€”â€”
+  // --- Sort results: working first, then expired, then errors ---
   const sortedResults = [...results].sort((a, b) => {
     const order = { working: 0, expired: 1, error: 2 };
     return (order[a.status] ?? 3) - (order[b.status] ?? 3);
   });
 
-  // â€”â€”â€” Render â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  // --- Render ------------------------------------------
   return (
     <div className="app-container">
       {/* Toast Notifications */}
@@ -318,7 +318,7 @@ export default function Home() {
           </h1>
         </div>
         <p className="header-subtitle">
-          Validate Netflix cookies instantly â€” paste, upload, and check
+          Validate Netflix cookies instantly - paste, upload, and check
         </p>
       </header>
 
@@ -347,7 +347,7 @@ export default function Home() {
         <textarea
           id="cookie-input"
           className="cookie-textarea"
-          placeholder={`Paste your Netflix cookies here...\n\nSupported formats:\nâ€¢ JSON array: [{"name":"NetflixId","value":"...","domain":".netflix.com",...}]\nâ€¢ Netscape: .netflix.com\tTRUE\t/\tTRUE\t0\tNetflixId\tvalue\nâ€¢ Combo: email:pass | ... | NetflixCookies = NetflixId=value\n\nSeparate multiple cookie sets with blank lines (not needed for Combo format).`}
+          placeholder={`Paste your Netflix cookies here...\n\nSupported formats:\n• JSON array: [{"name":"NetflixId","value":"...","domain":".netflix.com",...}]\n• Netscape: .netflix.com\tTRUE\t/\tTRUE\t0\tNetflixId\tvalue\n• Combo: email:pass | ... | NetflixCookies = NetflixId=value\n\nSeparate multiple cookie sets with blank lines (not needed for Combo format).`}
           value={cookieText}
           onChange={(e) => setCookieText(e.target.value)}
           disabled={isChecking}
@@ -497,7 +497,7 @@ export default function Home() {
                       {r.email}
                     </td>
                     <td>{r.country}</td>
-                    <td>{r.extraMembers !== null ? r.extraMembers : "â€”"}</td>
+                    <td>{r.extraMembers !== null ? r.extraMembers : "-"}</td>
                     <td>
                       {r.status === "working" ? (
                         <button
@@ -540,7 +540,7 @@ export default function Home() {
                           {copiedId === r.id ? "Copied!" : "Copy"}
                         </button>
                       ) : (
-                        <span style={{ color: "var(--text-muted, #555)" }}>â€”</span>
+                        <span style={{ color: "var(--text-muted, #555)" }}>-</span>
                       )}
                     </td>
                   </tr>
@@ -728,7 +728,7 @@ export default function Home() {
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 14, fontWeight: 700, color: "#22c55e",
               flexShrink: 0,
-            }}>âœ“</div>
+            }}>✓</div>
             <div>
               <strong style={{ color: "var(--text-primary, #eee)" }}>Refresh &amp; Enjoy</strong>
               <br />
@@ -742,7 +742,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="footer">
         <p>
-          Netflix Cookie Checker â€” For educational purposes only.
+          Netflix Cookie Checker - For educational purposes only.
           <br />
           Inspired by{" "}
           <a
