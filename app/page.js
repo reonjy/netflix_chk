@@ -3,9 +3,9 @@
 import { useState, useRef, useCallback } from "react";
 import { autoDetectAndParse, splitCookieSets } from "./lib/cookieParser";
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SVG Icons (inline to avoid external deps)
-   ═══════════════════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const Icons = {
   cookie: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -58,13 +58,26 @@ const Icons = {
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </svg>
   ),
+  clipboard: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  ),
+  clipboardCheck: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      <polyline points="14 19 16 21 20 17" />
+    </svg>
+  ),
 };
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Main Page Component
-   ═══════════════════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export default function Home() {
-  // ─── State ────────────────────────────────────────────────────────────
+  // â€”â€”â€” State â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
   const [cookieText, setCookieText] = useState("");
   const [format, setFormat] = useState("auto");
   const [isChecking, setIsChecking] = useState(false);
@@ -72,10 +85,11 @@ export default function Home() {
   const [results, setResults] = useState([]);
   const [toasts, setToasts] = useState([]);
   const [dragOver, setDragOver] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
   const fileInputRef = useRef(null);
   const toastIdRef = useRef(0);
 
-  // ─── Toast Helper ─────────────────────────────────────────────────────
+  // â€”â€”â€” Toast Helper â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
   const showToast = useCallback((message, type = "info") => {
     const id = ++toastIdRef.current;
     setToasts((prev) => [...prev, { id, message, type }]);
@@ -84,7 +98,7 @@ export default function Home() {
     }, 4000);
   }, []);
 
-  // ─── File Upload Handler ──────────────────────────────────────────────
+  // â€”â€”â€” File Upload Handler â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
   const handleFileUpload = useCallback(
     (file) => {
       if (!file) return;
@@ -99,7 +113,7 @@ export default function Home() {
     [showToast]
   );
 
-  // ─── Drag & Drop ─────────────────────────────────────────────────────
+  // â€”â€”â€” Drag & Drop â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
   const handleDrop = useCallback(
     (e) => {
       e.preventDefault();
@@ -110,7 +124,31 @@ export default function Home() {
     [handleFileUpload]
   );
 
-  // ─── Check Cookies ───────────────────────────────────────────────────
+  // â€”â€”â€” Copy Cookies in Netscape Format â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
+  const copyNetscapeCookies = useCallback(
+    (resultItem) => {
+      const netscapeLines = resultItem.cookies
+        .map((c) => {
+          const domain = c.domain || ".netflix.com";
+          const flag = c.flag || "TRUE";
+          const path = c.path || "/";
+          const secure = c.secure ? "TRUE" : "FALSE";
+          const expiration = c.expiration || "0";
+          return `${domain}\t${flag}\t${path}\t${secure}\t${expiration}\t${c.name}\t${c.value}`;
+        })
+        .join("\n");
+      navigator.clipboard.writeText(netscapeLines).then(() => {
+        setCopiedId(resultItem.id);
+        showToast("Cookies copied in Netscape format!", "success");
+        setTimeout(() => setCopiedId(null), 2000);
+      }).catch(() => {
+        showToast("Failed to copy to clipboard", "error");
+      });
+    },
+    [showToast]
+  );
+
+  // â€”â€”â€” Check Cookies â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
   const handleCheck = useCallback(async () => {
     if (!cookieText.trim()) {
       showToast("Please paste or upload cookies first", "error");
@@ -148,7 +186,7 @@ export default function Home() {
 
       // Check each cookie set sequentially
       for (let i = 0; i < parsedSets.length; i++) {
-        setProgress({ current: i + 1, total: parsedSets.length });
+        setProgress({ current: i + 1, total: parsedSets.length});
 
         try {
           const res = await fetch("/api/check", {
@@ -161,9 +199,9 @@ export default function Home() {
           allResults.push({
             id: i + 1,
             status: data.status || "error",
-            plan: data.details?.plan || "—",
-            email: data.details?.email || "—",
-            country: data.details?.country || "—",
+            plan: data.details?.plan || "â€”",
+            email: data.details?.email || "â€”",
+            country: data.details?.country || "â€”",
             extraMembers: data.details?.extraMembers ?? null,
             error: data.error || null,
             cookies: parsedSets[i].cookies,
@@ -172,9 +210,9 @@ export default function Home() {
           allResults.push({
             id: i + 1,
             status: "error",
-            plan: "—",
-            email: "—",
-            country: "—",
+            plan: "â€”",
+            email: "â€”",
+            country: "â€”",
             extraMembers: null,
             error: err.message,
             cookies: parsedSets[i].cookies,
@@ -203,7 +241,7 @@ export default function Home() {
     }
   }, [cookieText, showToast]);
 
-  // ─── Export Working Cookies ───────────────────────────────────────────
+  // â€”â€”â€” Export Working Cookies â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
   const exportWorking = useCallback(() => {
     const working = results.filter((r) => r.status === "working");
     if (working.length === 0) {
@@ -231,14 +269,14 @@ export default function Home() {
     showToast(`Exported ${working.length} working cookie set(s)`, "success");
   }, [results, showToast]);
 
-  // ─── Clear All ────────────────────────────────────────────────────────
+  // â€”â€”â€” Clear All â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
   const clearAll = useCallback(() => {
     setCookieText("");
     setResults([]);
     setProgress({ current: 0, total: 0 });
   }, []);
 
-  // ─── Stats Calculation ────────────────────────────────────────────────
+  // â€”â€”â€” Stats Calculation â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
   const stats = {
     total: results.length,
     working: results.filter((r) => r.status === "working").length,
@@ -246,7 +284,13 @@ export default function Home() {
     errors: results.filter((r) => r.status === "error").length,
   };
 
-  // ─── Render ───────────────────────────────────────────────────────────
+  // â€”â€”â€” Sort results: working first, then expired, then errors â€”â€”â€”
+  const sortedResults = [...results].sort((a, b) => {
+    const order = { working: 0, expired: 1, error: 2 };
+    return (order[a.status] ?? 3) - (order[b.status] ?? 3);
+  });
+
+  // â€”â€”â€” Render â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
   return (
     <div className="app-container">
       {/* Toast Notifications */}
@@ -274,7 +318,7 @@ export default function Home() {
           </h1>
         </div>
         <p className="header-subtitle">
-          Validate Netflix cookies instantly — paste, upload, and check
+          Validate Netflix cookies instantly â€” paste, upload, and check
         </p>
       </header>
 
@@ -303,7 +347,7 @@ export default function Home() {
         <textarea
           id="cookie-input"
           className="cookie-textarea"
-          placeholder={`Paste your Netflix cookies here...\n\nSupported formats:\n• JSON array: [{"name":"NetflixId","value":"...","domain":".netflix.com",...}]\n• Netscape: .netflix.com\tTRUE\t/\tTRUE\t0\tNetflixId\tvalue\n• Combo: email:pass | ... | NetflixCookies = NetflixId=value\n\nSeparate multiple cookie sets with blank lines (not needed for Combo format).`}
+          placeholder={`Paste your Netflix cookies here...\n\nSupported formats:\nâ€¢ JSON array: [{"name":"NetflixId","value":"...","domain":".netflix.com",...}]\nâ€¢ Netscape: .netflix.com\tTRUE\t/\tTRUE\t0\tNetflixId\tvalue\nâ€¢ Combo: email:pass | ... | NetflixCookies = NetflixId=value\n\nSeparate multiple cookie sets with blank lines (not needed for Combo format).`}
           value={cookieText}
           onChange={(e) => setCookieText(e.target.value)}
           disabled={isChecking}
@@ -433,11 +477,12 @@ export default function Home() {
                   <th>Email</th>
                   <th>Country</th>
                   <th>Extra Members</th>
+                  <th>Copy</th>
                 </tr>
               </thead>
               <tbody>
-                {results.map((r) => (
-                  <tr key={r.id}>
+                {sortedResults.map((r) => (
+                  <tr key={r.id} className={r.status === "working" ? "row-working" : ""}>
                     <td>{r.id}</td>
                     <td>
                       <span
@@ -452,7 +497,52 @@ export default function Home() {
                       {r.email}
                     </td>
                     <td>{r.country}</td>
-                    <td>{r.extraMembers !== null ? r.extraMembers : "—"}</td>
+                    <td>{r.extraMembers !== null ? r.extraMembers : "â€”"}</td>
+                    <td>
+                      {r.status === "working" ? (
+                        <button
+                          className="copy-btn"
+                          onClick={() => copyNetscapeCookies(r)}
+                          title="Copy cookies in Netscape format (for Cookie Editor)"
+                          style={{
+                            background: copiedId === r.id ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.05)",
+                            border: copiedId === r.id ? "1px solid rgba(34,197,94,0.5)" : "1px solid rgba(255,255,255,0.1)",
+                            borderRadius: "8px",
+                            padding: "6px 10px",
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            color: copiedId === r.id ? "#22c55e" : "var(--text-secondary, #aaa)",
+                            fontSize: "12px",
+                            fontWeight: 500,
+                            transition: "all 0.2s ease",
+                            whiteSpace: "nowrap",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (copiedId !== r.id) {
+                              e.currentTarget.style.background = "rgba(229,9,20,0.15)";
+                              e.currentTarget.style.borderColor = "rgba(229,9,20,0.4)";
+                              e.currentTarget.style.color = "#e50914";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (copiedId !== r.id) {
+                              e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                              e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                              e.currentTarget.style.color = "var(--text-secondary, #aaa)";
+                            }
+                          }}
+                        >
+                          <span style={{ width: 16, height: 16, display: "inline-flex" }}>
+                            {copiedId === r.id ? Icons.clipboardCheck : Icons.clipboard}
+                          </span>
+                          {copiedId === r.id ? "Copied!" : "Copy"}
+                        </button>
+                      ) : (
+                        <span style={{ color: "var(--text-muted, #555)" }}>â€”</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -473,7 +563,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="footer">
         <p>
-          Netflix Cookie Checker — For educational purposes only.
+          Netflix Cookie Checker â€” For educational purposes only.
           <br />
           Inspired by{" "}
           <a
