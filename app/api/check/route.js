@@ -1,5 +1,5 @@
 /**
- * Netflix Cookie Checker â€” API Route
+ * Netflix Cookie Checker — API Route
  * POST /api/check
  *
  * Accepts cookies, validates them against Netflix,
@@ -67,48 +67,42 @@ function isLoginRedirect(location) {
 /**
  * Process a 200 OK HTML response from a Netflix account page.
  * Returns { status, details } object.
+ * 
+ * STRICT validation: only marks as "working" if we can extract
+ * concrete account data (email, plan, etc). Generic page indicators
+ * like "reactContext" or "profiles" are NOT sufficient since they
+ * can appear on pages even with invalid/partial cookies.
  */
 function processAccountPage(html) {
-  // Check if we're on an actual login/signup page using reliable indicators,
-  // not just the generic word "login" which appears in JS bundles on valid pages too.
+  // Check for explicit non-member / logged-out indicators
   if (
-    (html.includes('"isNonMember":true') ||
-      html.includes('"isLoggedIn":false') ||
-      html.includes('"authURL"')) &&
-    !html.includes("membershipType") &&
-    !html.includes("localizedPlanName") &&
-    !html.includes("emailAddress") &&
-    !html.includes("reactContext")
+    html.includes('"isNonMember":true') ||
+    html.includes('"isLoggedIn":false')
   ) {
     return { status: "expired", details: null };
   }
 
   const details = extractInfo(html);
 
-  // If we found any account info, the cookie is working
-  if (details.email || details.plan) {
+  // Only mark as working if we found concrete account info
+  if (details.email || details.plan || details.country) {
     return { status: "working", details };
   }
 
-  // If page loaded but no info extracted, might still be valid
-  // Check for common logged-in indicators
-  if (
-    html.includes("reactContext") ||
-    html.includes("profiles") ||
-    html.includes('"memberSince"') ||
-    html.includes('"userInfo"')
-  ) {
+  // Check for a strong positive signal: logged-in flag set to true
+  if (html.includes('"isLoggedIn":true')) {
     return {
       status: "working",
       details: {
-        plan: details.plan || "Unknown",
-        email: details.email || "Hidden",
+        plan: "Unknown",
+        email: "Hidden",
         country: details.country || "Unknown",
         extraMembers: details.extraMembers,
       },
     };
   }
 
+  // No concrete account info found - treat as expired
   return { status: "expired", details: null };
 }
 
@@ -174,7 +168,7 @@ async function checkCookies(cookieHeader) {
               if (isLoginRedirect(location2)) {
                 return { status: "expired", details: null };
               }
-              // Two non-login redirects â€” give up on this URL, try next
+              // Two non-login redirects — give up on this URL, try next
               continue;
             }
 
@@ -196,7 +190,7 @@ async function checkCookies(cookieHeader) {
         return processAccountPage(html);
       }
 
-      // Other status codes â€” try next URL
+      // Other status codes — try next URL
     } catch (err) {
       if (err.name === "AbortError") {
         continue; // timeout, try next URL
