@@ -560,6 +560,185 @@ export default function Home() {
         </div>
       )}
 
+      {/* How to Use Instructions */}
+      <section className="glass-card" id="how-to-use" style={{ marginTop: 24 }}>
+        <h2 className="section-title" style={{ marginBottom: 16 }}>
+          <span className="icon">{Icons.alert}</span>
+          How to Use Working Cookies
+        </h2>
+
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          fontSize: "14px",
+          color: "var(--text-secondary, #bbb)",
+          lineHeight: 1.7,
+        }}>
+          {/* Step 1 */}
+          <div style={{
+            display: "flex",
+            gap: "14px",
+            alignItems: "flex-start",
+          }}>
+            <div style={{
+              minWidth: 32, height: 32,
+              borderRadius: "50%",
+              background: "rgba(229,9,20,0.15)",
+              border: "1px solid rgba(229,9,20,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 14, fontWeight: 700, color: "#e50914",
+              flexShrink: 0,
+            }}>1</div>
+            <div>
+              <strong style={{ color: "var(--text-primary, #eee)" }}>Install Cookie Editor Extension</strong>
+              <br />
+              Download and install the{" "}
+              <a
+                href="https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#e50914", textDecoration: "underline" }}
+              >
+                Cookie Editor
+              </a>{" "}
+              extension for your browser (available for Chrome, Firefox, and Edge).
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div style={{
+            display: "flex",
+            gap: "14px",
+            alignItems: "flex-start",
+          }}>
+            <div style={{
+              minWidth: 32, height: 32,
+              borderRadius: "50%",
+              background: "rgba(229,9,20,0.15)",
+              border: "1px solid rgba(229,9,20,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 14, fontWeight: 700, color: "#e50914",
+              flexShrink: 0,
+            }}>2</div>
+            <div>
+              <strong style={{ color: "var(--text-primary, #eee)" }}>Copy the Working Cookie</strong>
+              <br />
+              After checking your cookies, find a result marked as{" "}
+              <span style={{
+                display: "inline-flex", alignItems: "center", gap: 4,
+                background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)",
+                borderRadius: 4, padding: "1px 8px", fontSize: 12, color: "#22c55e",
+                fontWeight: 600, verticalAlign: "middle",
+              }}>working</span>{" "}
+              and click the <strong style={{ color: "var(--text-primary, #eee)" }}>Copy</strong> button in the last column.
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div style={{
+            display: "flex",
+            gap: "14px",
+            alignItems: "flex-start",
+          }}>
+            <div style={{
+              minWidth: 32, height: 32,
+              borderRadius: "50%",
+              background: "rgba(229,9,20,0.15)",
+              border: "1px solid rgba(229,9,20,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 14, fontWeight: 700, color: "#e50914",
+              flexShrink: 0,
+            }}>3</div>
+            <div>
+              <strong style={{ color: "var(--text-primary, #eee)" }}>Go to Netflix</strong>
+              <br />
+              Open{" "}
+              <a
+                href="https://www.netflix.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#e50914", textDecoration: "underline" }}
+              >
+                netflix.com
+              </a>{" "}
+              in your browser. You don&apos;t need to be logged in.
+            </div>
+          </div>
+
+          {/* Step 4 */}
+          <div style={{
+            display: "flex",
+            gap: "14px",
+            alignItems: "flex-start",
+          }}>
+            <div style={{
+              minWidth: 32, height: 32,
+              borderRadius: "50%",
+              background: "rgba(229,9,20,0.15)",
+              border: "1px solid rgba(229,9,20,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 14, fontWeight: 700, color: "#e50914",
+              flexShrink: 0,
+            }}>4</div>
+            <div>
+              <strong style={{ color: "var(--text-primary, #eee)" }}>Open Cookie Editor &amp; Delete Existing Cookies</strong>
+              <br />
+              Click the Cookie Editor icon in your browser toolbar. Click the{" "}
+              <strong style={{ color: "var(--text-primary, #eee)" }}>trash/delete all</strong>{" "}
+              button to remove any existing Netflix cookies first.
+            </div>
+          </div>
+
+          {/* Step 5 */}
+          <div style={{
+            display: "flex",
+            gap: "14px",
+            alignItems: "flex-start",
+          }}>
+            <div style={{
+              minWidth: 32, height: 32,
+              borderRadius: "50%",
+              background: "rgba(229,9,20,0.15)",
+              border: "1px solid rgba(229,9,20,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 14, fontWeight: 700, color: "#e50914",
+              flexShrink: 0,
+            }}>5</div>
+            <div>
+              <strong style={{ color: "var(--text-primary, #eee)" }}>Import the Copied Cookies</strong>
+              <br />
+              In Cookie Editor, click the <strong style={{ color: "var(--text-primary, #eee)" }}>Import</strong> button
+              (usually at the top-right). Paste the cookies you copied earlier into the text box, then click{" "}
+              <strong style={{ color: "var(--text-primary, #eee)" }}>Import</strong> to confirm.
+            </div>
+          </div>
+
+          {/* Step 6 */}
+          <div style={{
+            display: "flex",
+            gap: "14px",
+            alignItems: "flex-start",
+          }}>
+            <div style={{
+              minWidth: 32, height: 32,
+              borderRadius: "50%",
+              background: "rgba(34,197,94,0.15)",
+              border: "1px solid rgba(34,197,94,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 14, fontWeight: 700, color: "#22c55e",
+              flexShrink: 0,
+            }}>âœ“</div>
+            <div>
+              <strong style={{ color: "var(--text-primary, #eee)" }}>Refresh &amp; Enjoy</strong>
+              <br />
+              Reload the Netflix page (<strong style={{ color: "var(--text-primary, #eee)" }}>Ctrl+R</strong> or{" "}
+              <strong style={{ color: "var(--text-primary, #eee)" }}>F5</strong>). You should now be logged into the account.
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="footer">
         <p>
