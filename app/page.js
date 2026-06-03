@@ -124,10 +124,20 @@ export default function Home() {
     [handleFileUpload]
   );
 
-  // --- Copy Cookies (preserves original format) ----------------------
+  // --- Copy Cookies (always converts to Netscape format) ----------------------
   const copyCookies = useCallback(
     (resultItem) => {
-      navigator.clipboard.writeText(resultItem.rawText).then(() => {
+      const netscapeLines = resultItem.cookies
+        .map((c) => {
+          const domain = c.domain || ".netflix.com";
+          const flag = c.flag || "TRUE";
+          const path = c.path || "/";
+          const secure = c.secure ? "TRUE" : "FALSE";
+          const expiration = c.expiration || "0";
+          return `${domain}\t${flag}\t${path}\t${secure}\t${expiration}\t${c.name}\t${c.value}`;
+        })
+        .join("\n");
+      navigator.clipboard.writeText(netscapeLines).then(() => {
         setCopiedId(resultItem.id);
         showToast("Cookies copied to clipboard!", "success");
         setTimeout(() => setCopiedId(null), 2000);
