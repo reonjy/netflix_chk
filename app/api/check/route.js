@@ -1,5 +1,5 @@
 /**
- * Netflix Cookie Checker — API Route
+ * Netflix Cookie Checker â€” API Route
  * POST /api/check
  *
  * Accepts cookies, validates them against Netflix,
@@ -39,6 +39,106 @@ export async function POST(request) {
 }
 
 /**
+ * Standard request headers for Netflix requests.
+ */
+const NETFLIX_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+  Accept:
+    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Accept-Encoding": "identity",
+  "Sec-Fetch-Dest": "document",
+  "Sec-Fetch-Mode": "navigate",
+  "Sec-Fetch-Site": "none",
+  "Sec-Fetch-User": "?1",
+  "Upgrade-Insecure-Requests": "1",
+};
+
+/**
+ * Check if a redirect location points to a login/signin page.
+ */
+function isLoginRedirect(location) {
+  if (!location) return false;
+  const lower = location.toLowerCase();
+  return lower.includes("/login") || lower.includes("/signin") || lower.includes("login?");
+}
+
+/**
+ * Process a 200 OK HTML response from a Netflix account page.
+ * Returns { status, details } object.
+ */
+function processAccountPage(html) {
+  // Check if we're on an actual login/signup page using reliable indicators,
+  // not just the generic word "login" which appears in JS bundles on valid pages too.
+  if (
+    (html.includes('"isNonMember":true') ||
+      html.includes('"isLoggedIn":false') ||
+      html.includes('"authURL"')) &&
+    !html.includes("membershipType") &&
+    !html.includes("localizedPlanName") &&
+    !html.includes("emailAddress") &&
+    !html.includes("reactContext")
+  ) {
+    return { status: "expired", details: null };
+  }
+
+  const details = extractInfo(html);
+
+  // If we found any account info, the cookie is working
+  if (details.email || details.plan) {
+    return { status: "working", details };
+  }
+
+  // If page loaded but no info extracted, might still be valid
+  // Check for common logged-in indicators
+  if (
+    html.includes("reactContext") ||
+    html.includes("profiles") ||
+    html.includes('"memberSince"') ||
+    html.includes('"userInfo"')
+  ) {
+    return {
+      status: "working",
+      details: {
+        plan: details.plan || "Unknown",
+        email: details.email || "Hidden",
+        country: details.country || "Unknown",
+        extraMembers: details.extraMembers,
+      },
+    };
+  }
+
+  return { status: "expired", details: null };
+}
+
+/**
+ * Fetch a URL with cookies and a timeout. Returns the Response object.
+ * Uses redirect: "manual" so we can inspect redirects.
+ */
+async function fetchWithCookies(url, cookieHeader, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        ...NETFLIX_HEADERS,
+        Cookie: cookieHeader,
+      },
+      redirect: "manual",
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    return response;
+  } catch (err) {
+    clearTimeout(timeout);
+    throw err;
+  }
+}
+
+/**
  * Check cookies against Netflix by requesting the account page.
  */
 async function checkCookies(cookieHeader) {
@@ -49,85 +149,54 @@ async function checkCookies(cookieHeader) {
 
   for (const url of urls) {
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
+      const response = await fetchWithCookies(url, cookieHeader);
 
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-          Accept:
-            "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-          "Accept-Language": "en-US,en;q=0.9",
-          "Accept-Encoding": "identity",
-          Cookie: cookieHeader,
-          "Sec-Fetch-Dest": "document",
-          "Sec-Fetch-Mode": "navigate",
-          "Sec-Fetch-Site": "none",
-          "Sec-Fetch-User": "?1",
-          "Upgrade-Insecure-Requests": "1",
-        },
-        redirect: "manual",
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeout);
-
-      // If we get redirected to login, the cookies are expired
       const location = response.headers.get("location") || "";
-      if (
-        response.status === 302 ||
-        response.status === 301 ||
-        location.includes("login") ||
-        location.includes("Login")
-      ) {
-        return { status: "expired", details: null };
-      }
+      const status = response.status;
 
-      // If we get a 200, try to extract account info
-      if (response.status === 200) {
-        const html = await response.text();
-
-        // Check if we're actually on the account page (not redirected to a login page in-page)
-        if (
-          html.includes("login") &&
-          !html.includes("membershipType") &&
-          !html.includes("localizedPlanName") &&
-          !html.includes("emailAddress")
-        ) {
+      // Handle redirect responses
+      if (status === 301 || status === 302 || status === 303 || status === 307 || status === 308) {
+        // If redirected to a login page, the cookies are expired
+        if (isLoginRedirect(location)) {
           return { status: "expired", details: null };
         }
 
-        const details = extractInfo(html);
+        // Non-login redirect (e.g. locale redirect, /YourAccount -> /account)
+        // Follow it one hop with the same cookies
+        if (location) {
+          try {
+            const redirectUrl = new URL(location, url);
+            const response2 = await fetchWithCookies(redirectUrl.href, cookieHeader);
+            const location2 = response2.headers.get("location") || "";
 
-        // If we found any account info, the cookie is working
-        if (details.email || details.plan) {
-          return { status: "working", details };
+            // Check if the second response also redirects to login
+            if (response2.status >= 301 && response2.status <= 308) {
+              if (isLoginRedirect(location2)) {
+                return { status: "expired", details: null };
+              }
+              // Two non-login redirects â€” give up on this URL, try next
+              continue;
+            }
+
+            if (response2.status === 200) {
+              const html = await response2.text();
+              return processAccountPage(html);
+            }
+          } catch {
+            // Failed to follow redirect, try next URL
+            continue;
+          }
         }
-
-        // If page loaded but no info extracted, might still be valid
-        // Check for common logged-in indicators
-        if (
-          html.includes("reactContext") ||
-          html.includes("profiles") ||
-          html.includes("account")
-        ) {
-          return {
-            status: "working",
-            details: {
-              plan: details.plan || "Unknown",
-              email: details.email || "Hidden",
-              country: details.country || "Unknown",
-              extraMembers: details.extraMembers,
-            },
-          };
-        }
-
-        return { status: "expired", details: null };
+        continue;
       }
 
-      // Other status codes — try next URL
+      // If we get a 200, try to extract account info
+      if (status === 200) {
+        const html = await response.text();
+        return processAccountPage(html);
+      }
+
+      // Other status codes â€” try next URL
     } catch (err) {
       if (err.name === "AbortError") {
         continue; // timeout, try next URL
